@@ -228,3 +228,7 @@ Special thanks to the following projects and communities for their support and c
 - [@medv/finder](https://github.com/medv/finder) - Generates unique CSS selectors for elements
 - [OpenAI](https://openai.com/) - Provides powerful AI APIs
 - [Shields.io](https://shields.io/) - For generating badges
+
+## 📈 Star 历史
+
+[![Star History Chart](https://api.star-history.com/svg?repos=MaskerPRC/auto-vl-spider&type=Date)](https://star-history.com/#MaskerPRC/auto-vl-spider&Date)
