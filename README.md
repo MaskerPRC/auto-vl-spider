@@ -24,74 +24,50 @@ Welcome to **Web Crawler Script Generator**! 🎉 This is an Electron-based tool
 
 ## 里程碑 | Milestones 🎯
 
-### 短期目标 | Short-Term Goals 🚀
+- [ ] **优化 Electron 应用 UI** 💅🎨  
+  Improve the Electron application's UI for better aesthetics and user experience.
 
-1. **优化 Electron 应用 UI** 💅🎨
-   - 提升用户界面的美观性和用户体验，采用现代设计风格。
-   - 增加响应式设计，确保在不同屏幕尺寸下的良好显示。
+- [ ] **支持多字段 DOM 元素爬虫** 🔍🖥️  
+  Enable crawling of multiple DOM elements with various fields (e.g., title, summary, date).
 
-2. **支持多字段 DOM 元素爬虫** 🔍🖥️
-   - 允许用户选择和配置多个字段（如标题、摘要、时间等）的抓取。
-   - 提供灵活的字段映射功能，适应不同网站的结构。
+- [ ] **AI 整合优化生成的爬虫代码** 🤖💡  
+  Integrate AI to optimize and enhance the generated crawler scripts.
 
-3. **集成 AI 优化生成的爬虫代码步骤** 🤖💡
-   - 使用 OpenAI 的模型自动优化爬虫代码逻辑，提高代码效率和稳定性。
-   - 提供智能建议，帮助用户调整和改进爬虫脚本。
+- [ ] **添加调度爬取功能** 📅🔄  
+  Implement scheduling features for automated and periodic crawling.
 
-### 中期目标 | Mid-Term Goals 📈
+- [ ] **实现数据可视化和报告功能** 📊📈  
+  Develop data visualization and reporting tools to display scraped data effectively.
 
-4. **添加调度爬取功能** 📅🔄
-   - 允许用户设置定时任务，定期自动运行爬虫脚本。
-   - 支持多种调度策略，如每天、每周或按需运行。
+- [ ] **扩展与更多 Web 技术和框架的兼容性** 🌐📚  
+  Extend compatibility with more web technologies and frameworks (e.g., React, Vue, Angular).
 
-5. **实现数据可视化和报告功能** 📊📈
-   - 集成数据可视化工具，实时展示抓取的数据。
-   - 生成详细的报告，帮助用户分析和理解数据。
+- [ ] **实现协作功能以支持团队项目** 👥🤝  
+  Add collaboration features to support team projects and shared crawler scripts.
 
-6. **扩展与更多 Web 技术和框架的兼容性** 🌐📚
-   - 支持更多的前端框架（如 React、Vue、Angular）的自动解析和爬取。
-   - 提供针对动态内容和 SPA（单页应用）的优化爬取策略。
+- [ ] **添加插件支持，允许用户扩展功能** 🧩🔌  
+  Develop a plugin system to allow users to extend functionality with custom plugins.
 
-### 长期目标 | Long-Term Goals 🌟
+- [ ] **集成数据库和云存储解决方案** ☁️🗄️  
+  Integrate database and cloud storage solutions for storing and managing scraped data.
 
-7. **实现协作功能以支持团队项目** 👥🤝
-   - 允许多用户协作，共享和管理爬虫脚本。
-   - 提供权限管理，确保数据和脚本的安全性。
+- [ ] **增强安全性功能以保护用户数据** 🔒🛡️  
+  Enhance security features to protect user data and ensure privacy.
 
-8. **添加插件支持，允许用户扩展功能** 🧩🔌
-   - 开发插件系统，用户可以根据需求添加自定义功能。
-   - 提供丰富的插件库，涵盖各种爬取和数据处理需求。
+- [ ] **引入机器学习优化爬虫策略** 📚🤖  
+  Introduce machine learning to optimize crawling strategies for efficiency and accuracy.
 
-9. **集成数据库和云存储解决方案** ☁️🗄️
-   - 支持将抓取的数据直接存储到各种数据库（如 MongoDB、PostgreSQL）。
-   - 提供云存储集成，方便数据的备份和共享。
+- [ ] **开发移动端支持，扩展应用平台** 📱🌍  
+  Develop mobile support to expand the application's platform availability.
 
-10. **增强安全性功能以保护用户数据** 🔒🛡️
-   - 实现数据加密和安全传输，确保用户数据的隐私性。
-   - 提供安全审计和日志记录功能，监控和防范潜在的安全威胁。
+- [ ] **全球化扩展** 🌏✨  
+  Support more languages and expand to international markets.
 
-11. **引入机器学习优化爬虫策略** 📚🤖
-   - 使用机器学习算法分析和优化爬虫的抓取策略，提高效率和准确性。
-   - 自动适应网站结构的变化，减少维护成本。
+- [ ] **社区驱动的发展** 🏘️🌱  
+  Foster a community-driven development approach with active contributions and collaborations.
 
-12. **开发移动端支持，扩展应用平台** 📱🌍
-   - 设计和开发移动端应用版本，方便用户随时随地管理爬虫任务。
-   - 保持与桌面版本的功能一致性和数据同步。
-
-### 未来展望 | Future Prospects 🌠
-
-- **全球化扩展** 🌏✨
-   - 支持更多语言，满足全球用户的需求。
-   - 拓展国际市场，建立多语言社区。
-
-- **社区驱动的发展** 🏘️🌱
-   - 建立活跃的开发者和用户社区，促进知识分享和合作。
-   - 定期举办黑客松和贡献活动，激励更多人参与项目发展。
-
-- **持续创新与优化** 💡🔧
-   - 不断跟踪最新的技术趋势，集成先进的工具和技术。
-   - 持续优化性能和用户体验，保持项目的竞争力。
-
+- [ ] **持续创新与优化** 💡🔧  
+  Continuously innovate and optimize the tool to keep up with the latest technologies and user needs.
 
 ## 安装 | Installation 🚀
 
