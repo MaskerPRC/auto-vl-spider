@@ -6,8 +6,15 @@ const cheerio = require('cheerio');
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
+    // 设置视口大小
+    await page.setViewport({
+        width: 1280,  // 您可以根据需要调整宽度
+        height: 1000,
+        deviceScaleFactor: 1,
+    });
+
     // 导航到目标 URL
-    await page.goto('https://edition.cnn.com/', { waitUntil: 'networkidle2' });
+    await page.goto('https://hub.baai.ac.cn/?tag_id=90&sort=hot', { waitUntil: 'networkidle2' });
 
     // 获取页面内容
     const html = await page.content();
@@ -17,98 +24,62 @@ const cheerio = require('cheerio');
 
     const data = [];
 
-    // 提取第 1 个元素
-    const element0 = $('.container_lead-package__title_url-text');
-    if (element0.length > 0) {
-        const title = element0.first().text().trim();
-        // 根据需要调整摘要和时间的提取方式
-        data.push({
-            title: title,
-            summary: "Ruling party lawmakers boycotted the vote to impeach",
-            time: "undefined"
-        });
-    }
-
-    // 提取第 2 个元素
-    const element1 = $('.container__link--type-live-story .container__headline-text');
-    if (element1.length > 0) {
-        const title = element1.first().text().trim();
-        // 根据需要调整摘要和时间的提取方式
-        data.push({
-            title: title,
-            summary: "What the Syrian rebellion could mean for the balance of",
-            time: "undefined"
-        });
-    }
-
-    // 提取第 3 个元素
-    const element2 = $('.container:nth-child(2) > .container_lead-package__cards-wrapper .card:nth-child(2) .container__headline-text');
-    if (element2.length > 0) {
-        const title = element2.first().text().trim();
-        // 根据需要调整摘要和时间的提取方式
-        data.push({
-            title: title,
-            summary: "Why finding the suspected CEO killer is harder than",
-            time: "undefined"
-        });
-    }
-
-    // 提取第 4 个元素
-    const element3 = $('.container_list-headlines-with-images__cards-wrapper:nth-child(3) .card:nth-child(1) .container__headline-text');
-    if (element3.length > 0) {
-        const title = element3.first().text().trim();
-        // 根据需要调整摘要和时间的提取方式
-        data.push({
-            title: title,
-            summary: "A new $120,000 way to sail the",
-            time: "undefined"
-        });
-    }
-
-    // 提取第 5 个元素
-    const element4 = $('.container_list-headlines-with-images__cards-wrapper:nth-child(3) .card:nth-child(2) .container__headline-text');
-    if (element4.length > 0) {
-        const title = element4.first().text().trim();
-        // 根据需要调整摘要和时间的提取方式
-        data.push({
-            title: title,
-            summary: "The mysterious, mathematical origins of the",
-            time: "undefined"
-        });
-    }
-
-    // 提取第 6 个元素
-    const element5 = $('.container_list-headlines-with-images__cards-wrapper:nth-child(3) .card:nth-child(3) .container__headline-text');
-    if (element5.length > 0) {
-        const title = element5.first().text().trim();
-        // 根据需要调整摘要和时间的提取方式
-        data.push({
-            title: title,
-            summary: "Scientists find huge trove of rare",
-            time: "undefined"
-        });
-    }
-
     // 提取第 7 个元素
-    const element6 = $('.zone__items:nth-child(1) .container_lead-plus-headlines__cards-wrapper:nth-child(4) .card:nth-child(1) .container__headline-text:nth-child(1)');
+    const element6 = $('.story-list-container:nth-child(7) .story-item-title');
     if (element6.length > 0) {
         const title = element6.first().text().trim();
         // 根据需要调整摘要和时间的提取方式
         data.push({
             title: title,
-            summary: "Trump's arrival in Paris for Notre Dame's",
+            summary: "西湖大学吴泰霖课题组提出了一种新的生成式控制方法——扩散控制（DiffPhyCon）",
             time: "undefined"
         });
     }
 
     // 提取第 8 个元素
-    const element7 = $('.container__link--type-card .container__headline-text');
+    const element7 = $('.story-list-container:nth-child(8) .story-item-title');
     if (element7.length > 0) {
         const title = element7.first().text().trim();
         // 根据需要调整摘要和时间的提取方式
         data.push({
             title: title,
-            summary: "A Philadelphia teacher was found dead",
+            summary: "该研究探讨了复杂生态系统中微生物群落的多稳定性现象",
+            time: "undefined"
+        });
+    }
+
+    // 提取第 9 个元素
+    const element8 = $('.story-list-container:nth-child(9) .story-item-title');
+    if (element8.length > 0) {
+        const title = element8.first().text().trim();
+        // 根据需要调整摘要和时间的提取方式
+        data.push({
+            title: title,
+            summary: "上周日，果壳儿参加了奇绩创坛2024年秋季创业营路演日",
+            time: "undefined"
+        });
+    }
+
+    // 提取第 11 个元素
+    const element10 = $('.story-list-container:nth-child(11) .story-item-title');
+    if (element10.length > 0) {
+        const title = element10.first().text().trim();
+        // 根据需要调整摘要和时间的提取方式
+        data.push({
+            title: title,
+            summary: "清华大学交叉信息研究院濮云飞和段路明研究组在冷原子系统中实现12公里光纤长度上多模式增强的预报式原子",
+            time: "undefined"
+        });
+    }
+
+    // 提取第 12 个元素
+    const element11 = $('.story-list-container:nth-child(12) .story-item-title');
+    if (element11.length > 0) {
+        const title = element11.first().text().trim();
+        // 根据需要调整摘要和时间的提取方式
+        data.push({
+            title: title,
+            summary: "OpenAI 发布了季首直播，主要介绍了两项更新：o1 完全体和 ChatGPT Pro",
             time: "undefined"
         });
     }

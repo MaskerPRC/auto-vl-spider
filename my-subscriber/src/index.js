@@ -223,6 +223,13 @@ const cheerio = require('cheerio');
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
   
+  // 设置视口大小
+  await page.setViewport({
+      width: 1280,  // 您可以根据需要调整宽度
+      height: 1000,
+      deviceScaleFactor: 1,
+  });
+  
   // 导航到目标 URL
   await page.goto('${url}', { waitUntil: 'networkidle2' });
   
