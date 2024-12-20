@@ -1,10 +1,11 @@
 // main.js
+require('dotenv').config();
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('path');
 const fs = require('fs');
 const puppeteer = require('puppeteer'); // 使用 Puppeteer 进行头部浏览
 const axios = require('axios');
-const cheerio = require('cheerio');
+const OpenAI = require('openai');
 const API_URL = "http://localhost:5000/api"
 
 async function createWindow() {
@@ -38,6 +39,7 @@ ipcMain.handle('generate-crawler', async (event, url) => {
         // 使用 Puppeteer 打开网站
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
+
         await page.goto(url, {waitUntil: 'networkidle2'});
 
         // 设置视口大小
@@ -46,6 +48,10 @@ ipcMain.handle('generate-crawler', async (event, url) => {
             height: 1000,
             deviceScaleFactor: 1,
         });
+
+        await page.waitForNetworkIdle({
+            idleTime: 4000
+        })
 
         // 截图当前视口
         const screenshotBuffer = await page.screenshot({
@@ -57,25 +63,8 @@ ipcMain.handle('generate-crawler', async (event, url) => {
 
         // 获取页面文本，仅限于前 1000 像素高度
         const pageText = await page.evaluate(() => {
-            // 创建一个临时的容器，只包含前 1000 像素的内容
-            const container = document.createElement('div');
-            container.style.position = 'absolute';
-            container.style.top = '0';
-            container.style.left = '0';
-            container.style.width = '100%';
-            container.style.height = '1000px';
-            container.style.overflow = 'hidden';
-
-            // 克隆 body 的内容到临时容器
-            container.innerHTML = document.body.innerHTML;
-            document.body.appendChild(container);
-
             // 提取文本
-            const text = container.innerText;
-
-            // 移除临时容器
-            document.body.removeChild(container);
-
+            const text = document.body.innerHTML;
             return text.trim();
         });
 
@@ -92,10 +81,10 @@ ipcMain.handle('generate-crawler', async (event, url) => {
         );
 
         // 使用 @medv/finder 生成 div 的 CSS 选择器路径
-        const divPaths = await getDivPathsWithFinder(page, parsedData);
+        const cssSelectorInfo = await getDivPathsWithFinder(page, parsedData);
 
         // 生成爬虫代码
-        const crawlerCode = generateCrawlerCode(url, parsedData, divPaths);
+        const crawlerCode = generateCrawlerCode(url, parsedData, cssSelectorInfo);
 
         await browser.close();
 
@@ -141,7 +130,7 @@ async function transferJson(content, files) {
             "任务": "擅长将多模态内容转化为结构化数据",
         },
         input: {
-            "$question$": "将以下网站新闻文章截图及对应ocr文本内容转化为结构化数据，不得改动原文内容",
+            "$question$": "将以下网站，新闻，文章，截图等及及对应ocr文本内容转化为结构化数据，不得改动原文内容",
             "$ocrtxt$": content,
             "$ask$": "主要根据截图参考新闻布局，了解ocr文本的二维布局信息；从ocr文本中摘出需要结构化输出的内容，请勿改动",
         },
@@ -171,51 +160,71 @@ async function processWithOpenAI(imagePath, text) {
 function parseOpenAIResponse(data) {
     // 根据 OpenAI 返回的数据结构进行解析
     // 这里假设返回的数据包含一个 items 数组，每个项包含 title, summary, time
-    return data.news;
+    return data.structs;
 }
 
 // 使用 @medv/finder 生成 CSS 选择器路径
-async function getDivPathsWithFinder(page, items) {
-    return await page.evaluate((items) => {
-        // 确保 Finder 已经注入并挂载到 window 对象上
-        if (!window.Finder) {
-            console.error('Finder 未正确加载');
-            return items.map(() => null);
-        }
-        function findMinElementContainingText(text) {
-            function findElement(element) {
-                // 如果当前元素是文本节点，且包含目标文本
-                if (element.nodeType === Node.TEXT_NODE && element.textContent.includes(text)) {
-                    return element.parentElement; // 返回包含文本的父元素
-                }
+async function getDivPathsWithFinder(page, structs) {
+    const divPaths = {}
+    for (const struct of structs) {
+        const items = struct.items;
+        const struct_name = struct.struct_name;
+        const summary = struct.summary;
 
-                // 遍历该元素的所有子元素
-                for (let child of element.childNodes) {
-                    const result = findElement(child);
-                    if (result) {
-                        return result;
+        divPaths[struct_name] = {
+            summary,
+            cssSelectors: await page.evaluate((items) => {
+                // 确保 Finder 已经注入并挂载到 window 对象上
+                if (!window.Finder) {
+                    console.error('Finder 未正确加载');
+                    return items.map(() => null);
+                }
+                function findMinElementContainingText(text) {
+                    function findElement(element) {
+                        // 如果当前元素是文本节点，且包含目标文本
+                        if (element.nodeType === Node.TEXT_NODE && element.textContent.includes(text)) {
+                            return element.parentElement; // 返回包含文本的父元素
+                        }
+
+                        // 遍历该元素的所有子元素
+                        for (let child of element.childNodes) {
+                            const result = findElement(child);
+                            if (result) {
+                                return result;
+                            }
+                        }
+                        return null;
                     }
-                }
-                return null;
-            }
 
-            // 从文档的根元素开始搜索
-            return findElement(document.documentElement);
+                    // 从文档的根元素开始搜索
+                    return findElement(document.documentElement);
+                }
+                return items.map(item => {
+                    const selectors = {}
+                    let content = findMinElementContainingText(item.content);
+                    if (content) {
+                        selectors.content = window.Finder(content);
+                    }
+                    let source = findMinElementContainingText(item.source);
+                    if (source) {
+                        selectors.source = window.Finder(source);
+                    }
+                    let title = findMinElementContainingText(item.title);
+                    if (title) {
+                        selectors.title = window.Finder(title);
+                    }
+                    return selectors;
+                });
+            }, items)
         }
-        return items.map(item => {
-            const element = findMinElementContainingText(item.title);
-            if (element) {
-                return window.Finder(element);
-            }
-            return null;
-        });
-    }, items);
+    }
+    return divPaths;
 }
 
 
 // 示例函数：生成使用 Puppeteer 和 Cheerio 的爬虫代码
 function generateCrawlerCode(url, items, divPaths) {
-    let code = `const puppeteer = require('puppeteer');
+    let codeTpl = `const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 
 (async () => {
@@ -240,29 +249,29 @@ const cheerio = require('cheerio');
   const $ = cheerio.load(html);
   
   const data = [];
-`;
-
-    items.forEach((item, index) => {
-        const path = divPaths[index];
-        if (path) {
-            // 使用 Cheerio 选择器提取元素
-            code += `
-  // 提取第 ${index + 1} 个元素
-  const element${index} = $('${path}');
-  if (element${index}.length > 0) {
-    const title = element${index}.first().text().trim();
+  
+  // TODO 根据以下网站关键信息内容css选择器来完成爬虫代码，summary表示某个信息集合的介绍；cssSelectors中的content表示信息的内容选择器，source表示此信息来源平台选择器，title表示此信息标题的选择器
+  /**
+  【有效的css选择器】
+  ${JSON.stringify(divPaths, null, 2)}
+  【参考伪代码】
+  使用此方式获取选择器文本内容 
+  let title = $('.title_css_selector');
+  let content = $('.content_css_selector');
+  let source = $('.source_css_selector');
+  if (content.length > 0) {
+    const title_text = title.first().text().trim();
+    const content_text = content.first().text().trim();
+    const source_text = source.first().text().trim();
     // 根据需要调整摘要和时间的提取方式
     data.push({
-      title: title,
-      summary: "${item.summary}",
-      time: "${item.time}"
+      title: title_text,
+      summary: content_text,
+      source: source_text,
     });
   }
-`;
-        }
-    });
-
-    code += `
+  **/
+  
   // 输出提取的数据
   console.log(data);
   
@@ -270,6 +279,44 @@ const cheerio = require('cheerio');
   await browser.close();
 })();
 `;
+
+    const o1_prompt = "请思考并完成以下代码的TODO任务，要求只返回代码文本，不要包含其他内容\n【任务】\n" + codeTpl;
+
+    const code = genCrawlerCode(o1_prompt);
+    return code;
+}
+
+const genCrawlerCode = async (prompt) => {
+    console.log(prompt);
+    const openai = new OpenAI();
+    const completion = await openai.chat.completions.create({
+        model: 'anthropic/claude-3.5-sonnet',
+        messages: [
+            {
+                role: "user",
+                content: [
+                    {
+                        type: "text",
+                        text: prompt,
+                    }
+                ]
+            }
+        ]
+    });
+    function extractCodeBlocks(markdownText) {
+        const codeBlockRegex = /```.*?\n([\s\S]*?)```/g;
+        let match;
+        let codeBlocks = '';
+
+        while ((match = codeBlockRegex.exec(markdownText)) !== null) {
+            codeBlocks += match[1] + '\n\n';
+        }
+
+        return codeBlocks.trim();
+    }
+
+    console.log(completion.choices[0]?.message.content);
+    let code = extractCodeBlocks(completion.choices[0]?.message.content)
 
     return code;
 }

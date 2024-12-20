@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "cheerio": "^1.0.0",
+    "openai": "^4.77.0",
     "puppeteer": "^23.10.1"
   }
 }

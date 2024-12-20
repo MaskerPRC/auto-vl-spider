@@ -33,7 +33,9 @@
     "axios": "^1.7.9",
     "browserify": "^17.0.1",
     "cheerio": "^1.0.0",
+    "dotenv": "^16.4.7",
     "electron-squirrel-startup": "^1.0.1",
+    "openai": "^4.77.0",
     "puppeteer": "^23.10.1"
   }
 }
