@@ -238,12 +238,18 @@ const cheerio = require('cheerio');
       height: 1000,
       deviceScaleFactor: 1,
   });
-  
-  // 导航到目标 URL
-  await page.goto('${url}', { waitUntil: 'networkidle2' });
-  
-  // 获取页面内容
-  const html = await page.content();
+  let html = "";
+  try {
+      // 导航到目标 URL
+      await page.goto('https://www.chinatax.gov.cn/', { waitUntil: 'networkidle0' });
+      await new Promise((res, rej) => {
+          setTimeout(() => { res(); }, 2000);
+      })
+      // 获取页面内容
+      html = await page.content();
+  } catch (error) {
+      console.error('获取页面内容时出错:', error);
+  }
   
   // 使用 Cheerio 加载 HTML
   const $ = cheerio.load(html);
@@ -251,6 +257,7 @@ const cheerio = require('cheerio');
   const data = [];
   
   // TODO 根据以下网站关键信息内容css选择器来完成爬虫代码，summary表示某个信息集合的介绍；cssSelectors中的content表示信息的内容选择器，source表示此信息来源平台选择器，title表示此信息标题的选择器
+  // NOTICE 不要限制选择器检索到的项目数量，请全部爬取并返回
   /**
   【有效的css选择器】
   ${JSON.stringify(divPaths, null, 2)}
@@ -280,7 +287,7 @@ const cheerio = require('cheerio');
 })();
 `;
 
-    const o1_prompt = "请思考并完成以下代码的TODO任务，要求只返回代码文本，不要包含其他内容\n【任务】\n" + codeTpl;
+    const o1_prompt = "请思考并完成以下代码的TODO任务，要求并一次性完整返回返回代码文本，不要包含其他内容\n【任务】\n" + codeTpl;
 
     const code = genCrawlerCode(o1_prompt);
     return code;
